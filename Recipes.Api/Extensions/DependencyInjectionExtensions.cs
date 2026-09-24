@@ -1,4 +1,6 @@
 ﻿using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore;
+using Recipes.Api.Data;
 using Serilog;
 
 namespace Recipes.Api.Extensions;
@@ -30,5 +32,15 @@ public static class DependencyInjectionExtensions
 
         host.UseSerilog();
         return host;
+    }
+
+    public static IServiceCollection AddDatabaseContext(this IServiceCollection services, IConfiguration configuration)
+    {
+        var connectionString = configuration.GetConnectionString("PostgresDb") ??
+                               throw new NullReferenceException("The connection string is null.");
+
+        services.AddDbContext<AppDbContext>(options => { options.UseNpgsql(connectionString); });
+
+        return services;
     }
 }
