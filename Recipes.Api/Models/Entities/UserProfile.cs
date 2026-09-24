@@ -3,8 +3,8 @@
 public sealed class UserProfile
 {
     public Guid Id { get; init; }
-    public string FirstName { get; init; } = null!;
-    public string LastName { get; init; } = null!;
-    public string Bio { get; init; } = null!;
+    public string? FirstName { get; init; }
+    public string? LastName { get; init; }
+    public string? Bio { get; init; }
     public Guid UserId { get; init; }
 }
