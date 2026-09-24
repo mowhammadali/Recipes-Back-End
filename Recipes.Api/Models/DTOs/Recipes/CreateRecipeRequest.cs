@@ -1,7 +1,4 @@
-﻿using Recipes.Api.Models.DTOs.MealTypes;
-using Recipes.Api.Models.Entities;
-using Recipes.Api.Models.Enums;
-using Recipes.Api.Models.ValueObjects;
+﻿using Recipes.Api.Models.Enums;
 
 namespace Recipes.Api.Models.DTOs.Recipes;
 
