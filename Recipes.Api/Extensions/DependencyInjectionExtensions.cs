@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using System.Text.Json.Serialization;
+using Serilog;
 
 namespace Recipes.Api.Extensions;
 
@@ -6,7 +7,11 @@ public static class DependencyInjectionExtensions
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
-        services.AddControllers();
+        services.AddControllers().AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.Converters.Add(
+                new JsonStringEnumConverter());
+        });
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
 
