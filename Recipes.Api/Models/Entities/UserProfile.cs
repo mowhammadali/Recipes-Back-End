@@ -7,4 +7,5 @@ public sealed class UserProfile
     public string? LastName { get; init; }
     public string? Bio { get; init; }
     public Guid UserId { get; init; }
+    public User User { get; init; } = null!;
 }
