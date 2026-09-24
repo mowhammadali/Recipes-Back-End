@@ -27,11 +27,23 @@ public class RecipeConfiguration : IEntityTypeConfiguration<Recipe>
 
         builder.Property(r => r.CreatedAt).IsRequired();
 
-        builder.Property(r => r.Ingredients).IsRequired();
+        builder.OwnsMany(r => r.Ingredients, ingredient =>
+        {
+            ingredient.ToTable("RecipeIngredients");
 
-        builder.Property(r => r.Instructions).IsRequired();
+            ingredient.Property(i => i.Name).IsRequired();
+            ingredient.Property(i => i.Quantity).IsRequired();
+            ingredient.Property(i => i.Unit).IsRequired();
+        });
 
-        builder.Property(r => r.MealTypes).IsRequired();
+        // builder.Property(r => r.Instructions).IsRequired();
+        builder.OwnsMany(r => r.Instructions, instruction =>
+        {
+            instruction.ToTable("RecipeInstructions");
+
+            instruction.Property(x => x.Description)
+                .IsRequired();
+        });
 
         builder.HasOne(r => r.User)
             .WithMany(x => x.Recipes)

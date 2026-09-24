@@ -18,6 +18,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+await app.SeedDatabaseAsync();
 app.UseMiddleware<ExceptionHandingMiddleware>();
 app.UseHttpsRedirection();
 
