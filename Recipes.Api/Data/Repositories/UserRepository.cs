@@ -1,4 +1,5 @@
-﻿using Recipes.Api.Data.Repositories.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using Recipes.Api.Data.Repositories.Interfaces;
 using Recipes.Api.Models.Entities;
 
 namespace Recipes.Api.Data.Repositories;
@@ -12,28 +13,35 @@ public sealed class UserRepository : IUserRepository
         _dbContext = context;
     }
 
-    public Task<bool> ExistsByEmailAsync(string email)
+    public async Task<bool> ExistsByEmailAsync(string email)
     {
-        throw new NotImplementedException();
+        return await _dbContext.Users.AnyAsync(u => u.Email == email);
     }
 
-    public Task<bool> ExistsByUsernameAsync(string username)
+    public async Task<bool> ExistsByUsernameAsync(string username)
     {
-        throw new NotImplementedException();
+        return await _dbContext.Users.AnyAsync(u => u.Username == username);
     }
 
-    public Task<User?> GetByIdAsync(Guid id)
+    public async Task<User?> GetByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == id);
+
+        return user;
     }
 
-    public Task AddAsync(User user)
+    public async Task AddAsync(User user)
     {
-        throw new NotImplementedException();
+        await _dbContext.Users.AddAsync(user);
     }
 
     public void Update(User user)
     {
-        throw new NotImplementedException();
+        _dbContext.Users.Update(user);
+    }
+
+    public void Delete(User user)
+    {
+        _dbContext.Users.Remove(user);
     }
 }
