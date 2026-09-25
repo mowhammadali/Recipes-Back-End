@@ -5,6 +5,7 @@ using Recipes.Api.Data.Repositories;
 using Recipes.Api.Data.Repositories.Interfaces;
 using Recipes.Api.Data.Seed;
 using Recipes.Api.Mapping;
+using Recipes.Api.Services;
 using Recipes.Api.Services.Interfaces;
 using Serilog;
 using Serilog.Formatting.Compact;
@@ -24,7 +25,7 @@ public static class DependencyInjectionExtensions
         services.AddSwaggerGen();
         services.AddAutoMapper(cfg => { }, typeof(MealTypeMappingProfile).Assembly);
 
-        services.AddScoped<IMealTypeService, IMealTypeService>();
+        services.AddScoped<IMealTypeService, MealTypeService>();
 
         return services;
     }
