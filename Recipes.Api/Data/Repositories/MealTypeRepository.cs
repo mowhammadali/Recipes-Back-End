@@ -3,7 +3,7 @@ using Recipes.Api.Models.Entities;
 
 namespace Recipes.Api.Data.Repositories;
 
-public class MealTypeRepository : IMealTypeRepository
+public sealed class MealTypeRepository : IMealTypeRepository
 {
     private readonly AppDbContext _dbContext;
 
