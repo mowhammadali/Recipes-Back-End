@@ -11,7 +11,17 @@ public sealed class UserRepository : IUserRepository
     {
         _dbContext = context;
     }
-    
+
+    public Task<bool> ExistsByEmailAsync(string email)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<bool> ExistsByUsernameAsync(string username)
+    {
+        throw new NotImplementedException();
+    }
+
     public Task<User?> GetByIdAsync(Guid id)
     {
         throw new NotImplementedException();
