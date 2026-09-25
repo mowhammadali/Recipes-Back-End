@@ -4,5 +4,5 @@ public sealed class MealType
 {
     public Guid Id { get; init; }
     public string Name { get; init; } = null!;
-    public List<Recipe> Recipes { get; init; } = [];
+    public ICollection<Recipe> Recipes { get; init; } = [];
 }
