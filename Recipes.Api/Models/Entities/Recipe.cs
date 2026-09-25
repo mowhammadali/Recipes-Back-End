@@ -14,9 +14,9 @@ public sealed class Recipe
     public Difficulty Difficulty { get; init; }
     public string? ImageUrl { get; init; }
     public DateTime CreatedAt { get; init; }
-    public List<Ingredient> Ingredients { get; init; } = [];
-    public List<Instruction> Instructions { get; init; } = [];
-    public List<MealType> MealTypes { get; init; } = [];
+    public ICollection<Ingredient> Ingredients { get; init; } = [];
+    public ICollection<Instruction> Instructions { get; init; } = [];
+    public ICollection<MealType> MealTypes { get; init; } = [];
     public Guid UserId { get; init; }
     public User User { get; init; } = null!;
 }

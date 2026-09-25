@@ -8,4 +8,5 @@ public sealed class User
     public string PasswordHash { get; init; } = null!;
     public DateTime CreatedAt { get; init; }
     public UserProfile UserProfile { get; init; } = null!;
+    public ICollection<Recipe> Recipes { get; init; } = [];
 }
