@@ -1,6 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Recipes.Api.Data;
+using Recipes.Api.Data.Repositories;
+using Recipes.Api.Data.Repositories.Interfaces;
 using Recipes.Api.Data.Seed;
 using Serilog;
 using Serilog.Formatting.Compact;
@@ -18,6 +20,14 @@ public static class DependencyInjectionExtensions
         });
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
+
+        services.AddScoped<IRecipeRepository, RecipeRepository>();
+        services.AddScoped<IMealTypeRepository, MealTypeRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IUserProfileRepository, UserProfileRepository>();
+        services.AddScoped<IFavoriteRepository, FavoriteRepository>();
+
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;
     }
