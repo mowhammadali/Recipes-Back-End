@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using FluentValidation;
 using Recipes.Api.Models.DTOs.Auth;
+using Recipes.Api.Services.Interfaces;
 
 namespace Recipes.Api.Controllers;
 
@@ -9,10 +10,12 @@ namespace Recipes.Api.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IValidator<RegisterRequest> _registerValidator;
+    private readonly IAuthService _authService;
 
-    public AuthController(IValidator<RegisterRequest> validator)
+    public AuthController(IValidator<RegisterRequest> validator, IAuthService authService)
     {
         _registerValidator = validator;
+        _authService = authService;
     }
 
     [HttpPost("register")]
@@ -27,6 +30,8 @@ public class AuthController : ControllerBase
             return BadRequest(validationResult.Errors);
         }
 
-        return Ok(registerRequest);
+        await _authService.RegisterAsync(registerRequest);
+
+        return Ok();
     }
 }
