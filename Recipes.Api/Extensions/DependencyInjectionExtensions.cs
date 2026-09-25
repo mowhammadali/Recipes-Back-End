@@ -25,7 +25,9 @@ public static class DependencyInjectionExtensions
         services.AddSwaggerGen();
         services.AddAutoMapper(cfg => { }, typeof(MealTypeMappingProfile).Assembly);
 
+        services.AddScoped<IPasswordHasher, PasswordHasherService>();
         services.AddScoped<IMealTypeService, MealTypeService>();
+
 
         return services;
     }
