@@ -4,5 +4,5 @@ namespace Recipes.Api.Services.Interfaces;
 
 public interface IAuthService
 {
-    Task RegisterAsync(RegisterRequest registerRequest);
+    Task<AuthResponse> RegisterAsync(RegisterRequest registerRequest);
 }

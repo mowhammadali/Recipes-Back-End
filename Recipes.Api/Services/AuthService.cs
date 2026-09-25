@@ -19,7 +19,7 @@ public class AuthService : IAuthService
         _passwordHasher = passwordHasher;
     }
 
-    public async Task RegisterAsync(RegisterRequest registerRequest)
+    public async Task<AuthResponse> RegisterAsync(RegisterRequest registerRequest)
     {
         var emailExists = await _unitOfWork.Users.ExistsByEmailAsync(registerRequest.Email);
 
@@ -58,5 +58,11 @@ public class AuthService : IAuthService
             "User registered successfully. UserId: {UserId}, Username: {Username}",
             user.Id,
             user.Username);
+
+        return new AuthResponse()
+        {
+            AccessToken = string.Empty,
+            ExpiresAt = DateTime.UtcNow.AddHours(24)
+        };
     }
 }

@@ -30,8 +30,8 @@ public class AuthController : ControllerBase
             return BadRequest(validationResult.Errors);
         }
 
-        await _authService.RegisterAsync(registerRequest);
+        var response = await _authService.RegisterAsync(registerRequest);
 
-        return Ok();
+        return Ok(response);
     }
 }
