@@ -1,4 +1,5 @@
-﻿using Recipes.Api.Models.Entities;
+﻿using Recipes.Api.Data.Repositories.Interfaces;
+using Recipes.Api.Models.Entities;
 
 namespace Recipes.Api.Data.Repositories;
 

@@ -1,6 +1,8 @@
-﻿namespace Recipes.Api.Data.Repositories;
+﻿using Recipes.Api.Data.Repositories.Interfaces;
 
-public class UnitOfWork : IUnitOfWork
+namespace Recipes.Api.Data.Repositories;
+
+public sealed class UnitOfWork : IUnitOfWork
 {
     private readonly AppDbContext _dbContext;
 

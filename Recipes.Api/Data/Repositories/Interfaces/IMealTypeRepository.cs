@@ -1,6 +1,6 @@
 ﻿using Recipes.Api.Models.Entities;
 
-namespace Recipes.Api.Data.Repositories;
+namespace Recipes.Api.Data.Repositories.Interfaces;
 
 public interface IMealTypeRepository
 {
