@@ -21,7 +21,9 @@ public class RecipeConfiguration : IEntityTypeConfiguration<Recipe>
 
         builder.Property(r => r.Serving).IsRequired();
 
-        builder.Property(r => r.Difficulty).IsRequired();
+        builder.Property(r => r.Difficulty)
+            .HasConversion<string>()
+            .IsRequired();
 
         builder.Property(r => r.ImageUrl).HasMaxLength(400);
 

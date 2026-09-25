@@ -20,7 +20,12 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.CreatedAt).IsRequired();
 
         builder.HasIndex(u => u.Username).IsUnique();
+
         builder.HasIndex(u => u.Email).IsUnique();
+
+        builder.Property(u => u.Role)
+            .HasConversion<string>()
+            .IsRequired();
 
         builder.HasOne(u => u.UserProfile)
             .WithOne(u => u.User)

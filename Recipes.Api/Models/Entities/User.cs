@@ -1,4 +1,6 @@
-﻿namespace Recipes.Api.Models.Entities;
+﻿using Recipes.Api.Models.Enums;
+
+namespace Recipes.Api.Models.Entities;
 
 public sealed class User
 {
@@ -7,6 +9,7 @@ public sealed class User
     public string Email { get; init; } = null!;
     public string PasswordHash { get; init; } = null!;
     public DateTime CreatedAt { get; init; }
+    public UserRole Role { get; init; }
     public UserProfile UserProfile { get; init; } = null!;
     public ICollection<Recipe> Recipes { get; init; } = [];
 }
