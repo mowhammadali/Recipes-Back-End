@@ -1,7 +1,12 @@
 ﻿using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Recipes.Api.Data;
+using Recipes.Api.Data.Repositories;
+using Recipes.Api.Data.Repositories.Interfaces;
 using Recipes.Api.Data.Seed;
+using Recipes.Api.Mapping;
+using Recipes.Api.Services;
+using Recipes.Api.Services.Interfaces;
 using Serilog;
 using Serilog.Formatting.Compact;
 
@@ -18,6 +23,9 @@ public static class DependencyInjectionExtensions
         });
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
+        services.AddAutoMapper(cfg => { }, typeof(MealTypeMappingProfile).Assembly);
+
+        services.AddScoped<IMealTypeService, MealTypeService>();
 
         return services;
     }
@@ -45,6 +53,19 @@ public static class DependencyInjectionExtensions
                                throw new NullReferenceException("The connection string is null.");
 
         services.AddDbContext<AppDbContext>(options => { options.UseNpgsql(connectionString); });
+
+        return services;
+    }
+
+    public static IServiceCollection AddInfrastructureServices(this IServiceCollection services)
+    {
+        services.AddScoped<IRecipeRepository, RecipeRepository>();
+        services.AddScoped<IMealTypeRepository, MealTypeRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IUserProfileRepository, UserProfileRepository>();
+        services.AddScoped<IFavoriteRepository, FavoriteRepository>();
+
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;
     }

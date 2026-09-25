@@ -7,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddApplicationServices();
 builder.Services.AddDatabaseContext(builder.Configuration);
+builder.Services.AddInfrastructureServices();
 builder.Host.AddLoggingConfiguration();
 
 var app = builder.Build();
