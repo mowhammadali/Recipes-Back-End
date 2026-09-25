@@ -31,7 +31,7 @@ public static class DependencyInjectionExtensions
         services.AddScoped<IPasswordHasher, PasswordHasherService>();
         services.AddScoped<IMealTypeService, MealTypeService>();
         services.AddScoped<IAuthService, AuthService>();
-
+        services.AddScoped<IJwtService, JwtService>();
 
         return services;
     }

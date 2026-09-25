@@ -11,12 +11,15 @@ public class AuthService : IAuthService
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<AuthService> _logger;
     private readonly IPasswordHasher _passwordHasher;
+    private readonly IJwtService _jwtService;
 
-    public AuthService(IUnitOfWork unitOfWork, ILogger<AuthService> logger, IPasswordHasher passwordHasher)
+    public AuthService(IUnitOfWork unitOfWork, ILogger<AuthService> logger, IPasswordHasher passwordHasher,
+        IJwtService jwtService)
     {
         _unitOfWork = unitOfWork;
         _logger = logger;
         _passwordHasher = passwordHasher;
+        _jwtService = jwtService;
     }
 
     public async Task<AuthResponse> RegisterAsync(RegisterRequest registerRequest)
@@ -54,6 +57,8 @@ public class AuthService : IAuthService
         await _unitOfWork.Users.AddAsync(user);
         await _unitOfWork.SaveChangesAsync();
 
+        var tokenResponse = _jwtService.GenerateToken(user);
+
         _logger.LogInformation(
             "User registered successfully. UserId: {UserId}, Username: {Username}",
             user.Id,
@@ -61,8 +66,8 @@ public class AuthService : IAuthService
 
         return new AuthResponse()
         {
-            AccessToken = string.Empty,
-            ExpiresAt = DateTime.UtcNow.AddHours(24)
+            AccessToken = tokenResponse.AccessToken,
+            ExpiresAt = tokenResponse.ExpiresAt,
         };
     }
 }
