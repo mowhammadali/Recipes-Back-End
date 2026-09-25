@@ -54,10 +54,10 @@ public class AuthService : IAuthService
             }
         };
 
+        var tokenResponse = _jwtService.GenerateToken(user);
+
         await _unitOfWork.Users.AddAsync(user);
         await _unitOfWork.SaveChangesAsync();
-
-        var tokenResponse = _jwtService.GenerateToken(user);
 
         _logger.LogInformation(
             "User registered successfully. UserId: {UserId}, Username: {Username}",
