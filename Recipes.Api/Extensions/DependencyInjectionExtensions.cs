@@ -79,7 +79,8 @@ public static class DependencyInjectionExtensions
         var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         var logger = scope.ServiceProvider
             .GetRequiredService<ILogger<Program>>();
+        var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
 
-        await DatabaseSeeder.SeedAsync(dbContext, logger);
+        await DatabaseSeeder.SeedAsync(dbContext, logger, passwordHasher);
     }
 }
