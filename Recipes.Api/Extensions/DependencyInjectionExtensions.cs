@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Recipes.Api.Data;
 using Recipes.Api.Data.Repositories;
@@ -7,6 +8,7 @@ using Recipes.Api.Data.Seed;
 using Recipes.Api.Mapping;
 using Recipes.Api.Services;
 using Recipes.Api.Services.Interfaces;
+using Recipes.Api.Validators.Auth;
 using Serilog;
 using Serilog.Formatting.Compact;
 
@@ -24,6 +26,7 @@ public static class DependencyInjectionExtensions
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
         services.AddAutoMapper(cfg => { }, typeof(MealTypeMappingProfile).Assembly);
+        services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
 
         services.AddScoped<IPasswordHasher, PasswordHasherService>();
         services.AddScoped<IMealTypeService, MealTypeService>();
