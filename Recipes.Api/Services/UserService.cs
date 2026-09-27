@@ -45,4 +45,24 @@ public sealed class UserService : IUserService
 
         return response;
     }
+
+    public async Task DeleteAsync(Guid userId)
+    {
+        var isUserRemoved = await _unitOfWork.Users.DeleteAsync(userId);
+
+        if (!isUserRemoved)
+        {
+            _logger.LogWarning(
+                "Delete user failed. User not found. UserId: {UserId}",
+                userId);
+
+            throw new NotFoundException("User not found");
+        }
+
+        await _unitOfWork.SaveChangesAsync();
+
+        _logger.LogInformation(
+            "User deleted successfully. UserId: {UserId}",
+            userId);
+    }
 }

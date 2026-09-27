@@ -43,4 +43,17 @@ public class UserController : ControllerBase
 
         return Ok(user);
     }
+
+    [HttpDelete("remove/{userId:guid}")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> DeleteAsync([FromRoute] Guid userId)
+    {
+        await _userService.DeleteAsync(userId);
+        return NoContent();
+    }
 }
