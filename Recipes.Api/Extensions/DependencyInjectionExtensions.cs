@@ -1,6 +1,9 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Text;
+using System.Text.Json.Serialization;
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Recipes.Api.Data;
 using Recipes.Api.Data.Repositories;
 using Recipes.Api.Data.Repositories.Interfaces;
@@ -86,5 +89,34 @@ public static class DependencyInjectionExtensions
         var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
 
         await DatabaseSeeder.SeedAsync(dbContext, logger, passwordHasher);
+    }
+
+    public static IServiceCollection AddJwtConfiguration(this IServiceCollection services, IConfiguration configuration)
+    {
+        services
+            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                var secretKey = configuration["Jwt:SecretKey"]
+                                ?? throw new InvalidOperationException(
+                                    "JWT secret key is not configured.");
+
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(secretKey)),
+
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+
+                    ValidateLifetime = true,
+
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
+
+        return services;
     }
 }
