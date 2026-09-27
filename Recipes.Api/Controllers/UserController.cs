@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Recipes.Api.Data.Repositories.Interfaces;
 using Recipes.Api.Models.DTOs.Users;
 using Recipes.Api.Services.Interfaces;
 
@@ -11,10 +11,12 @@ namespace Recipes.Api.Controllers;
 public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
+    private readonly IValidator<AdminUpdateUserRequest> _adminUpdateUserValidator;
 
-    public UserController(IUserService userService)
+    public UserController(IUserService userService, IValidator<AdminUpdateUserRequest> adminUpdateUserValidator)
     {
         _userService = userService;
+        _adminUpdateUserValidator = adminUpdateUserValidator;
     }
 
     [HttpGet("get-all")]
@@ -54,6 +56,27 @@ public class UserController : ControllerBase
     public async Task<IActionResult> DeleteAsync([FromRoute] Guid userId)
     {
         await _userService.DeleteAsync(userId);
+        return NoContent();
+    }
+
+    [HttpPut("update-by-admin/{userId:guid}")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> UpdateByAdminAsync([FromRoute] Guid userId,
+        [FromBody] AdminUpdateUserRequest adminUpdateUserRequest)
+    {
+        var validationResult = await _adminUpdateUserValidator.ValidateAsync(adminUpdateUserRequest);
+
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors);
+        }
+
+        await _userService.UpdateByAdminAsync(userId, adminUpdateUserRequest);
         return NoContent();
     }
 }
