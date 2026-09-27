@@ -13,6 +13,11 @@ public sealed class UserRepository : IUserRepository
         _dbContext = context;
     }
 
+    public async Task<List<User>> GetAllAsync()
+    {
+        return await _dbContext.Users.ToListAsync();
+    }
+
     public async Task<bool> ExistsByEmailAsync(string email)
     {
         return await _dbContext.Users.AnyAsync(u => u.Email == email);
