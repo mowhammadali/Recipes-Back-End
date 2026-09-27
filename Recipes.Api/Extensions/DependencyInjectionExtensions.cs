@@ -4,6 +4,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Recipes.Api.Data;
 using Recipes.Api.Data.Repositories;
 using Recipes.Api.Data.Repositories.Interfaces;
@@ -27,7 +28,6 @@ public static class DependencyInjectionExtensions
                 new JsonStringEnumConverter());
         });
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
         services.AddAutoMapper(cfg => { }, typeof(MealTypeMappingProfile).Assembly);
         services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
 
@@ -35,6 +35,42 @@ public static class DependencyInjectionExtensions
         services.AddScoped<IMealTypeService, MealTypeService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IJwtService, JwtService>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddSwaggerGen(this IServiceCollection services)
+    {
+        services.AddSwaggerGen(options =>
+        {
+            options.AddSecurityDefinition(
+                "Bearer",
+                new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "Enter your JWT token."
+                });
+
+            options.AddSecurityRequirement(
+                new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
+        });
 
         return services;
     }
