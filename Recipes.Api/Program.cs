@@ -6,8 +6,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddApplicationServices();
+builder.Services.AddSwaggerGen();
 builder.Services.AddDatabaseContext(builder.Configuration);
 builder.Services.AddInfrastructureServices();
+builder.Services.AddJwtConfiguration(builder.Configuration);
 builder.Host.AddLoggingConfiguration();
 
 var app = builder.Build();
@@ -23,6 +25,8 @@ await app.SeedDatabaseAsync();
 app.UseMiddleware<ExceptionHandingMiddleware>();
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 
 app.Run();

@@ -1,4 +1,6 @@
-﻿namespace Recipes.Api.Middleware;
+﻿using Recipes.Api.Exceptions;
+
+namespace Recipes.Api.Middleware;
 
 public class ExceptionHandingMiddleware
 {
@@ -17,6 +19,20 @@ public class ExceptionHandingMiddleware
         try
         {
             await _next(context);
+        }
+        catch (AppException ex)
+        {
+            _logger.LogWarning(
+                ex,
+                "Application exception occurred.");
+
+            context.Response.StatusCode = ex.StatusCode;
+
+            await context.Response.WriteAsJsonAsync(new
+            {
+                statusCode = ex.StatusCode,
+                message = ex.Message
+            });
         }
         catch (Exception ex)
         {
