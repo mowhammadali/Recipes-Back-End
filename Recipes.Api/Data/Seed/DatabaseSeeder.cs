@@ -115,7 +115,11 @@ public static class DatabaseSeeder
             Email = "admin@gmail.com",
             PasswordHash = passwordHasher.Hash(adminPassword),
             Role = UserRole.Admin,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            UserProfile = new UserProfile()
+            {
+                Id = Guid.NewGuid()
+            },
         };
 
         await dbContext.Users.AddAsync(admin);
