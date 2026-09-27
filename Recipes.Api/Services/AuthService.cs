@@ -1,4 +1,5 @@
 ﻿using Recipes.Api.Data.Repositories.Interfaces;
+using Recipes.Api.Exceptions;
 using Recipes.Api.Models.DTOs.Auth;
 using Recipes.Api.Models.Entities;
 using Recipes.Api.Models.Enums;
@@ -29,7 +30,7 @@ public class AuthService : IAuthService
         if (emailExists)
         {
             _logger.LogError($"Email {registerRequest.Email} already exists");
-            throw new InvalidOperationException("Email already exists");
+            throw new ConflictException("Email already exists");
         }
 
         var nameExists = await _unitOfWork.Users.ExistsByUsernameAsync(registerRequest.Username);
@@ -37,7 +38,7 @@ public class AuthService : IAuthService
         if (nameExists)
         {
             _logger.LogError($"Username {registerRequest.Username} already exists");
-            throw new InvalidOperationException("Username already exists");
+            throw new ConflictException("Username already exists");
         }
 
         User user = new()
@@ -81,7 +82,7 @@ public class AuthService : IAuthService
                 "Login failed. User with email {Email} was not found.",
                 loginRequest.Email);
 
-            throw new UnauthorizedAccessException("Invalid email or password");
+            throw new UnauthorizedException("Invalid email or password");
         }
 
         var passwordValid = _passwordHasher.Verify(loginRequest.Password, user.PasswordHash);
@@ -91,6 +92,8 @@ public class AuthService : IAuthService
             _logger.LogWarning(
                 "Login failed. Invalid password for user {UserId}.",
                 loginRequest.Password);
+
+            throw new UnauthorizedException("Invalid email or password");
         }
 
         var token = _jwtService.GenerateToken(user);
