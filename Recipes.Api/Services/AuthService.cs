@@ -1,6 +1,8 @@
-﻿using Recipes.Api.Data.Repositories.Interfaces;
+﻿using AutoMapper;
+using Recipes.Api.Data.Repositories.Interfaces;
 using Recipes.Api.Exceptions;
 using Recipes.Api.Models.DTOs.Auth;
+using Recipes.Api.Models.DTOs.Users;
 using Recipes.Api.Models.Entities;
 using Recipes.Api.Models.Enums;
 using Recipes.Api.Services.Interfaces;
@@ -13,14 +15,16 @@ public class AuthService : IAuthService
     private readonly ILogger<AuthService> _logger;
     private readonly IPasswordHasher _passwordHasher;
     private readonly IJwtService _jwtService;
+    protected readonly IMapper _mapper;
 
     public AuthService(IUnitOfWork unitOfWork, ILogger<AuthService> logger, IPasswordHasher passwordHasher,
-        IJwtService jwtService)
+        IJwtService jwtService, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
         _logger = logger;
         _passwordHasher = passwordHasher;
         _jwtService = jwtService;
+        _mapper = mapper;
     }
 
     public async Task<AuthResponse> RegisterAsync(RegisterRequest registerRequest)
@@ -108,5 +112,22 @@ public class AuthService : IAuthService
             AccessToken = token.AccessToken,
             ExpiresAt = token.ExpiresAt,
         };
+    }
+
+    public async Task<UserResponse> GetMe(Guid userId)
+    {
+        var user = await _unitOfWork.Users.GetByIdWithProfileAsync(userId);
+
+        if (user is null)
+        {
+            _logger.LogWarning(
+                "User profile requested but user was not found. UserId: {UserId}",
+                userId);
+
+            throw new NotFoundException("User not found");
+        }
+
+        var userResponse = _mapper.Map<UserResponse>(user);
+        return userResponse;
     }
 }
