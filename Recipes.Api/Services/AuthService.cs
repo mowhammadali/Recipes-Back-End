@@ -70,4 +70,40 @@ public class AuthService : IAuthService
             ExpiresAt = tokenResponse.ExpiresAt,
         };
     }
+
+    public async Task<AuthResponse> LoginAsync(LoginRequest loginRequest)
+    {
+        var user = await _unitOfWork.Users.GetByEmailAsync(loginRequest.Email);
+
+        if (user is null)
+        {
+            _logger.LogWarning(
+                "Login failed. User with email {Email} was not found.",
+                loginRequest.Email);
+
+            throw new UnauthorizedAccessException("Invalid email or password");
+        }
+
+        var passwordValid = _passwordHasher.Verify(loginRequest.Password, user.PasswordHash);
+
+        if (!passwordValid)
+        {
+            _logger.LogWarning(
+                "Login failed. Invalid password for user {UserId}.",
+                loginRequest.Password);
+        }
+
+        var token = _jwtService.GenerateToken(user);
+
+        _logger.LogInformation(
+            "User logged in successfully. UserId: {UserId}, Username: {Username}",
+            user.Id,
+            user.Username);
+
+        return new AuthResponse()
+        {
+            AccessToken = token.AccessToken,
+            ExpiresAt = token.ExpiresAt,
+        };
+    }
 }
