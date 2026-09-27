@@ -5,7 +5,7 @@ using Recipes.Api.Services.Interfaces;
 
 namespace Recipes.Api.Services;
 
-public class MealTypeService : IMealTypeService
+public sealed class MealTypeService : IMealTypeService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;

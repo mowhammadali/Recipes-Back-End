@@ -9,7 +9,7 @@ using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegiste
 
 namespace Recipes.Api.Services;
 
-public class JwtService : IJwtService
+public sealed class JwtService : IJwtService
 {
     private readonly IConfiguration _configuration;
 

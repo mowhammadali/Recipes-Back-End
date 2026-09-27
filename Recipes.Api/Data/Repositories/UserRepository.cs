@@ -15,7 +15,7 @@ public sealed class UserRepository : IUserRepository
 
     public async Task<List<User>> GetAllAsync()
     {
-        return await _dbContext.Users.ToListAsync();
+        return await _dbContext.Users.Include(u => u.UserProfile).ToListAsync();
     }
 
     public async Task<bool> ExistsByEmailAsync(string email)

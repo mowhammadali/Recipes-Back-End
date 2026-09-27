@@ -3,7 +3,7 @@ using Recipes.Api.Services.Interfaces;
 
 namespace Recipes.Api.Services;
 
-public class PasswordHasherService : IPasswordHasher
+public sealed class PasswordHasherService : IPasswordHasher
 {
     private readonly PasswordHasher<object> _hasher = new();
 
