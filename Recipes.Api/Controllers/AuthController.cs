@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
+using Recipes.Api.Exceptions;
 using Recipes.Api.Models.DTOs.Auth;
+using Recipes.Api.Models.DTOs.Users;
 using Recipes.Api.Services.Interfaces;
 
 namespace Recipes.Api.Controllers;
@@ -19,7 +23,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -38,7 +42,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -47,5 +51,26 @@ public class AuthController : ControllerBase
         var authResponse = await _authService.LoginAsync(loginRequest);
 
         return Ok(authResponse);
+    }
+
+    [HttpGet("me")]
+    [Authorize]
+    [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<UserResponse>> GetMe()
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+        if (userIdClaim is null || !Guid.TryParse(userIdClaim.Value, out var userId))
+        {
+            throw new UnauthorizedException(
+                "Invalid user identity.");
+        }
+
+        var response = await _authService.GetMe(userId);
+
+        return Ok(response);
     }
 }
