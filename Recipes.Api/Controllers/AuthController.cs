@@ -21,7 +21,7 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Register([FromBody] RegisterRequest registerRequest)
+    public async Task<ActionResult<AuthResponse>> Register([FromBody] RegisterRequest registerRequest)
     {
         var validationResult = await _registerValidator.ValidateAsync(registerRequest);
 
@@ -33,5 +33,16 @@ public class AuthController : ControllerBase
         var response = await _authService.RegisterAsync(registerRequest);
 
         return Ok(response);
+    }
+
+    [HttpPost("login")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest loginRequest)
+    {
+        var authResponse = await _authService.LoginAsync(loginRequest);
+
+        return Ok(authResponse);
     }
 }
