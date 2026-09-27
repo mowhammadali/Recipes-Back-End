@@ -14,12 +14,15 @@ namespace Recipes.Api.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IValidator<RegisterRequest> _registerValidator;
+    private readonly IValidator<LoginRequest> _loginValidator;
     private readonly IAuthService _authService;
 
-    public AuthController(IValidator<RegisterRequest> validator, IAuthService authService)
+    public AuthController(IValidator<RegisterRequest> validator, IAuthService authService,
+        IValidator<LoginRequest> loginValidator)
     {
         _registerValidator = validator;
         _authService = authService;
+        _loginValidator = loginValidator;
     }
 
     [HttpPost("register")]
@@ -48,6 +51,13 @@ public class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest loginRequest)
     {
+        var validationResult = await _loginValidator.ValidateAsync(loginRequest);
+
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors);
+        }
+
         var authResponse = await _authService.LoginAsync(loginRequest);
 
         return Ok(authResponse);
