@@ -15,7 +15,7 @@ public sealed class AuthService : IAuthService
     private readonly ILogger<AuthService> _logger;
     private readonly IPasswordHasher _passwordHasher;
     private readonly IJwtService _jwtService;
-    protected readonly IMapper _mapper;
+    private readonly IMapper _mapper;
 
     public AuthService(IUnitOfWork unitOfWork, ILogger<AuthService> logger, IPasswordHasher passwordHasher,
         IJwtService jwtService, IMapper mapper)
@@ -89,13 +89,13 @@ public sealed class AuthService : IAuthService
             throw new UnauthorizedException("Invalid email or password");
         }
 
-        var passwordValid = _passwordHasher.Verify(loginRequest.Password, user.PasswordHash);
+        var isPasswordValid = _passwordHasher.Verify(loginRequest.Password, user.PasswordHash);
 
-        if (!passwordValid)
+        if (!isPasswordValid)
         {
             _logger.LogWarning(
                 "Login failed. Invalid password for user {UserId}.",
-                loginRequest.Password);
+                user.Id);
 
             throw new UnauthorizedException("Invalid email or password");
         }
@@ -114,7 +114,7 @@ public sealed class AuthService : IAuthService
         };
     }
 
-    public async Task<UserResponse> GetMe(Guid userId)
+    public async Task<UserResponse> GetMeAsync(Guid userId)
     {
         var user = await _unitOfWork.Users.GetByIdWithProfileAsync(userId);
 
@@ -129,5 +129,39 @@ public sealed class AuthService : IAuthService
 
         var userResponse = _mapper.Map<UserResponse>(user);
         return userResponse;
+    }
+
+    public async Task ChangePasswordAsync(Guid userId, string oldPassword, string newPassword)
+    {
+        var user = await _unitOfWork.Users.GetByIdAsync(userId);
+
+        if (user is null)
+        {
+            _logger.LogWarning(
+                "User was not found. UserId: {UserId}",
+                userId);
+
+            throw new NotFoundException("User not found");
+        }
+
+        var isPasswordValid = _passwordHasher.Verify(oldPassword, user.PasswordHash);
+
+        if (!isPasswordValid)
+        {
+            _logger.LogWarning(
+                "User password is incorrect. UserId: {UserId}",
+                userId);
+
+            throw new BadRequestException("Current password is incorrect");
+        }
+
+        user.PasswordHash = _passwordHasher.Hash(newPassword);
+
+        _unitOfWork.Users.Update(user);
+        await _unitOfWork.SaveChangesAsync();
+
+        _logger.LogInformation(
+            "Password has changed successfully. UserId: {UserId}",
+            userId);
     }
 }
