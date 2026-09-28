@@ -5,6 +5,7 @@ namespace Recipes.Api.Data.Repositories.Interfaces;
 public interface IRecipeRepository
 {
     Task<Recipe?> GetByIdAsync(Guid id);
+    IQueryable<Recipe> Query();
     Task<List<Recipe>> GetAllAsync();
     Task AddAsync(Recipe recipe);
     void Update(Recipe recipe);
