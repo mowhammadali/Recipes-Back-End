@@ -2,7 +2,6 @@
 using Recipes.Api.Data.Repositories.Interfaces;
 using Recipes.Api.Exceptions;
 using Recipes.Api.Models.DTOs.Users;
-using Recipes.Api.Models.Entities;
 using Recipes.Api.Services.Interfaces;
 
 namespace Recipes.Api.Services;
@@ -50,8 +49,17 @@ public sealed class UserService : IUserService
         return response;
     }
 
-    public async Task DeleteAsync(Guid userId)
+    public async Task DeleteAsync(Guid userId, Guid currentUserId)
     {
+        if (userId == currentUserId)
+        {
+            _logger.LogWarning(
+                "Admin attempted to delete their own account. AdminId: {AdminId}",
+                currentUserId);
+
+            throw new ForbiddenException("An admin cannot delete their own account.");
+        }
+
         var isUserRemoved = await _unitOfWork.Users.DeleteAsync(userId);
 
         if (!isUserRemoved)

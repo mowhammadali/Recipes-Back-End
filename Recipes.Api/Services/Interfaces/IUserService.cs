@@ -7,6 +7,6 @@ public interface IUserService
 {
     Task<List<UserResponse>> GetAllAsync();
     Task<UserResponse> GetByIdAsync(Guid userId);
-    Task DeleteAsync(Guid userId);
+    Task DeleteAsync(Guid userId, Guid currentUserId);
     Task UpdateByAdminAsync(Guid userId, AdminUpdateUserRequest user);
 }

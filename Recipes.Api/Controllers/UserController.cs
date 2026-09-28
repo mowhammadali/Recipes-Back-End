@@ -1,6 +1,8 @@
-﻿using FluentValidation;
+﻿using System.Security.Claims;
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Recipes.Api.Exceptions;
 using Recipes.Api.Models.DTOs.Users;
 using Recipes.Api.Services.Interfaces;
 
@@ -55,7 +57,15 @@ public class UserController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> DeleteAsync([FromRoute] Guid userId)
     {
-        await _userService.DeleteAsync(userId);
+        var currentUserClaimId = User.FindFirst(ClaimTypes.NameIdentifier);
+
+        if (currentUserClaimId is null || !Guid.TryParse(currentUserClaimId.Value, out var currentUserId))
+        {
+            throw new UnauthorizedException(
+                "Invalid user identity.");
+        }
+
+        await _userService.DeleteAsync(userId, currentUserId);
         return NoContent();
     }
 
