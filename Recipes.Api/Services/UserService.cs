@@ -109,4 +109,49 @@ public sealed class UserService : IUserService
             "User updated successfully by admin. UserId: {UserId}",
             userId);
     }
+
+    public async Task<UserResponse> UpdateByUserAsync(Guid userId, UpdateUserRequest updateUserRequest)
+    {
+        var user = await _unitOfWork.Users.GetByIdWithProfileAsync(userId);
+
+        if (user is null)
+        {
+            _logger.LogWarning(
+                "User update failed. User not found. UserId: {UserId}",
+                userId);
+
+            throw new NotFoundException("User not found");
+        }
+
+        user.Username = updateUserRequest.Username;
+        user.Email = updateUserRequest.Email;
+
+        if (!string.IsNullOrWhiteSpace(updateUserRequest.FirstName))
+        {
+            user.UserProfile.FirstName = updateUserRequest.FirstName;
+        }
+
+        if (!string.IsNullOrWhiteSpace(updateUserRequest.LastName))
+        {
+            user.UserProfile.LastName = updateUserRequest.LastName;
+        }
+
+        if (!string.IsNullOrWhiteSpace(updateUserRequest.Bio))
+        {
+            user.UserProfile.Bio = updateUserRequest.Bio;
+        }
+
+        user.UpdatedAt = DateTime.UtcNow;
+
+        _unitOfWork.Users.Update(user);
+        await _unitOfWork.SaveChangesAsync();
+
+        var updatedUser = _mapper.Map<UserResponse>(user);
+
+        _logger.LogInformation(
+            "User updated successfully. UserId: {UserId}",
+            userId);
+
+        return updatedUser;
+    }
 }

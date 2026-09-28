@@ -3,9 +3,9 @@
 public sealed class UserProfile
 {
     public Guid Id { get; init; }
-    public string? FirstName { get; init; }
-    public string? LastName { get; init; }
-    public string? Bio { get; init; }
+    public string? FirstName { get; set; }
+    public string? LastName { get; set; }
+    public string? Bio { get; set; }
     public Guid UserId { get; init; }
     public User User { get; init; } = null!;
 }

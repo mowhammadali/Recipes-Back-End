@@ -14,11 +14,14 @@ public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
     private readonly IValidator<AdminUpdateUserRequest> _adminUpdateUserValidator;
+    private readonly IValidator<UpdateUserRequest> _updateUserValidator;
 
-    public UserController(IUserService userService, IValidator<AdminUpdateUserRequest> adminUpdateUserValidator)
+    public UserController(IUserService userService, IValidator<AdminUpdateUserRequest> adminUpdateUserValidator,
+        IValidator<UpdateUserRequest> updateUserValidator)
     {
         _userService = userService;
         _adminUpdateUserValidator = adminUpdateUserValidator;
+        _updateUserValidator = updateUserValidator;
     }
 
     [HttpGet("get-all")]
@@ -88,5 +91,34 @@ public class UserController : ControllerBase
 
         await _userService.UpdateByAdminAsync(userId, adminUpdateUserRequest);
         return NoContent();
+    }
+
+    [HttpPut("update-by-user")]
+    [Authorize]
+    [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<UserResponse>> UpdateAsync([FromBody] UpdateUserRequest updateUserRequest)
+    {
+        var userClaimId = User.FindFirst(ClaimTypes.NameIdentifier);
+
+        if (userClaimId is null || !Guid.TryParse(userClaimId.Value, out var userId))
+        {
+            throw new UnauthorizedException(
+                "Invalid user identity.");
+        }
+
+        var validateResult = await _updateUserValidator.ValidateAsync(updateUserRequest);
+
+        if (!validateResult.IsValid)
+        {
+            return BadRequest(validateResult.Errors);
+        }
+
+        var updatedUser = await _userService.UpdateByUserAsync(userId, updateUserRequest);
+
+        return Ok(updatedUser);
     }
 }
