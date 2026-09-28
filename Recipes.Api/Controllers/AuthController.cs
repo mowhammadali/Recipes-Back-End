@@ -6,6 +6,7 @@ using Recipes.Api.Exceptions;
 using Recipes.Api.Models.DTOs.Auth;
 using Recipes.Api.Models.DTOs.Users;
 using Recipes.Api.Services.Interfaces;
+using Recipes.Api.Validators.Auth;
 
 namespace Recipes.Api.Controllers;
 
@@ -15,14 +16,16 @@ public class AuthController : ControllerBase
 {
     private readonly IValidator<RegisterRequest> _registerValidator;
     private readonly IValidator<LoginRequest> _loginValidator;
+    private readonly IValidator<ChangePasswordRequest> _changePasswordValidator;
     private readonly IAuthService _authService;
 
     public AuthController(IValidator<RegisterRequest> validator, IAuthService authService,
-        IValidator<LoginRequest> loginValidator)
+        IValidator<LoginRequest> loginValidator, IValidator<ChangePasswordRequest> changePasswordValidator)
     {
         _registerValidator = validator;
         _authService = authService;
         _loginValidator = loginValidator;
+        _changePasswordValidator = changePasswordValidator;
     }
 
     [HttpPost("register")]
@@ -69,7 +72,7 @@ public class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<UserResponse>> GetMe()
+    public async Task<ActionResult<UserResponse>> GetMeAsync()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
 
@@ -79,8 +82,38 @@ public class AuthController : ControllerBase
                 "Invalid user identity.");
         }
 
-        var response = await _authService.GetMe(userId);
+        var response = await _authService.GetMeAsync(userId);
 
         return Ok(response);
+    }
+
+    [HttpPost("change-password")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> ChangePasswordAsync([FromBody] ChangePasswordRequest changePasswordRequest)
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+        if (userIdClaim is null || !Guid.TryParse(userIdClaim.Value, out var userId))
+        {
+            throw new UnauthorizedException(
+                "Invalid user identity.");
+        }
+
+        var validationResult = await _changePasswordValidator.ValidateAsync(changePasswordRequest);
+
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors);
+        }
+
+        await _authService.ChangePasswordAsync(userId, changePasswordRequest.OldPassword,
+            changePasswordRequest.NewPassword);
+
+        return NoContent();
     }
 }
