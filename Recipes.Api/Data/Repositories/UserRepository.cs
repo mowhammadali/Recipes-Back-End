@@ -13,6 +13,11 @@ public sealed class UserRepository : IUserRepository
         _dbContext = context;
     }
 
+    public async Task<List<User>> GetAllAsync()
+    {
+        return await _dbContext.Users.Include(u => u.UserProfile).ToListAsync();
+    }
+
     public async Task<bool> ExistsByEmailAsync(string email)
     {
         return await _dbContext.Users.AnyAsync(u => u.Email == email);
@@ -54,8 +59,16 @@ public sealed class UserRepository : IUserRepository
         _dbContext.Users.Update(user);
     }
 
-    public void Delete(User user)
+    public async Task<bool> DeleteAsync(Guid userId)
     {
+        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
+        if (user is null)
+        {
+            return false;
+        }
+
         _dbContext.Users.Remove(user);
+        return true;
     }
 }

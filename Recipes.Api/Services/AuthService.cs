@@ -9,7 +9,7 @@ using Recipes.Api.Services.Interfaces;
 
 namespace Recipes.Api.Services;
 
-public class AuthService : IAuthService
+public sealed class AuthService : IAuthService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<AuthService> _logger;
