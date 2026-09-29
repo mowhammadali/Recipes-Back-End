@@ -82,4 +82,24 @@ public class RecipeController : ControllerBase
 
         return CreatedAtRoute("GetRecipeById", new { id = response.Id }, response);
     }
+
+    [HttpDelete("{recipeId:guid}")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> DeleteAsync([FromRoute] Guid recipeId)
+    {
+        var userClaimId = User.FindFirst(ClaimTypes.NameIdentifier);
+
+        if (userClaimId is null || !Guid.TryParse(userClaimId.Value, out var userId))
+        {
+            throw new UnauthorizedException(
+                "Invalid user identity.");
+        }
+
+        await _recipeService.DeleteAsync(recipeId, userId);
+        return NoContent();
+    }
 }

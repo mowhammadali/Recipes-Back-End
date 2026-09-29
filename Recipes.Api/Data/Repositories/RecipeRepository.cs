@@ -51,8 +51,8 @@ public sealed class RecipeRepository : IRecipeRepository
         throw new NotImplementedException();
     }
 
-    public void Delete(Guid id)
+    public void Delete(Recipe recipe)
     {
-        throw new NotImplementedException();
+        _dbContext.Recipes.Remove(recipe);
     }
 }

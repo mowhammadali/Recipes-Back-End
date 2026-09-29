@@ -9,5 +9,5 @@ public interface IRecipeRepository
     IQueryable<Recipe> Query();
     Task AddAsync(Recipe recipe);
     void Update(Recipe recipe);
-    void Delete(Guid id);
+    void Delete(Recipe recipe);
 }

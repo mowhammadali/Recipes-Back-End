@@ -112,4 +112,37 @@ public sealed class RecipeService : IRecipeService
         var response = _mapper.Map<RecipeResponse>(createdRecipe);
         return response;
     }
+
+    public async Task DeleteAsync(Guid recipeId, Guid userId)
+    {
+        var recipe = await _unitOfWork.Recipes.GetByIdAsync(recipeId);
+
+        if (recipe is null)
+        {
+            _logger.LogWarning(
+                "Recipe with id {RecipeId} not found",
+                recipeId);
+
+            throw new NotFoundException("Recipe not found");
+        }
+
+        if (recipe.UserId != userId)
+        {
+            _logger.LogWarning(
+                "User {UserId} attempted to delete recipe {RecipeId} owned by another user.",
+                userId,
+                recipeId);
+
+            throw new ForbiddenException(
+                "You can only delete your own recipes.");
+        }
+
+        _unitOfWork.Recipes.Delete(recipe);
+        await _unitOfWork.SaveChangesAsync();
+
+        _logger.LogInformation(
+            "Recipe {RecipeId} has been deleted by user {UserId}",
+            recipeId,
+            userId);
+    }
 }
