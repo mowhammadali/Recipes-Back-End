@@ -5,6 +5,8 @@ using Recipes.Api.Data.Repositories.Interfaces;
 using Recipes.Api.Exceptions;
 using Recipes.Api.Models.DTOs.Common;
 using Recipes.Api.Models.DTOs.Recipes;
+using Recipes.Api.Models.Entities;
+using Recipes.Api.Models.ValueObjects;
 using Recipes.Api.Services.Interfaces;
 
 namespace Recipes.Api.Services;
@@ -67,6 +69,47 @@ public sealed class RecipeService : IRecipeService
         }
 
         var response = _mapper.Map<RecipeResponse>(recipe);
+        return response;
+    }
+
+    public async Task<RecipeResponse> AddAsync(Guid userId, CreateRecipeRequest createRecipeRequest)
+    {
+        var mealTypes = await _unitOfWork.Recipes.GetMealTypesByIdsAsync(createRecipeRequest.MealTypeIds);
+
+        if (mealTypes.Count != createRecipeRequest.MealTypeIds.Distinct().Count())
+        {
+            throw new BadRequestException(
+                "One or more meal types do not exist.");
+        }
+
+        var recipe = new Recipe()
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            Name = createRecipeRequest.Name,
+            Description = createRecipeRequest.Description,
+            PrepTimeMinutes = createRecipeRequest.PrepTimeMinutes,
+            CookTimeMinutes = createRecipeRequest.CookTimeMinutes,
+            Serving = createRecipeRequest.Serving,
+            Difficulty = createRecipeRequest.Difficulty,
+            CreatedAt = DateTime.UtcNow,
+            Ingredients = createRecipeRequest.Ingredients
+                .Select(x => new Ingredient(x.Name, x.Quantity, x.Unit))
+                .ToList(),
+            Instructions = createRecipeRequest.Instructions
+                .Select((x, index) => new Instruction(
+                    index + 1,
+                    x.Description))
+                .ToList(),
+            MealTypes = mealTypes
+        };
+
+        await _unitOfWork.Recipes.AddAsync(recipe);
+        await _unitOfWork.SaveChangesAsync();
+
+        var createdRecipe = _unitOfWork.Recipes.GetByIdAsync(recipe.Id);
+
+        var response = _mapper.Map<RecipeResponse>(createdRecipe);
         return response;
     }
 }

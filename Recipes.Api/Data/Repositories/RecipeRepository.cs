@@ -25,6 +25,13 @@ public sealed class RecipeRepository : IRecipeRepository
         return recipe;
     }
 
+    public async Task<List<MealType>> GetMealTypesByIdsAsync(List<Guid> ids)
+    {
+        var mealTypes = await _dbContext.MealTypes.Where(m => ids.Contains(m.Id)).ToListAsync();
+
+        return mealTypes;
+    }
+
     public IQueryable<Recipe> Query()
     {
         return _dbContext.Recipes.AsNoTracking()
@@ -34,9 +41,9 @@ public sealed class RecipeRepository : IRecipeRepository
             .Include(r => r.User);
     }
 
-    public Task AddAsync(Recipe recipe)
+    public async Task AddAsync(Recipe recipe)
     {
-        throw new NotImplementedException();
+        await _dbContext.Recipes.AddAsync(recipe);
     }
 
     public void Update(Recipe recipe)
