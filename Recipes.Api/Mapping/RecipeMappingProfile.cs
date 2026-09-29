@@ -18,9 +18,5 @@ public class RecipeMappingProfile : Profile
         CreateMap<Ingredient, IngredientResponse>();
 
         CreateMap<Instruction, InstructionResponse>();
-
-        CreateMap<MealType, MealTypeResponse>();
-
-        CreateMap<User, RecipeUserResponse>();
     }
 }
