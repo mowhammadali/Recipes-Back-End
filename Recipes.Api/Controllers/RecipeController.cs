@@ -1,5 +1,8 @@
-﻿using FluentValidation;
+﻿using System.Security.Claims;
+using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Recipes.Api.Exceptions;
 using Recipes.Api.Models.DTOs.Common;
 using Recipes.Api.Models.DTOs.Recipes;
 using Recipes.Api.Services.Interfaces;
@@ -11,12 +14,16 @@ namespace Recipes.Api.Controllers;
 public class RecipeController : ControllerBase
 {
     private readonly IRecipeService _recipeService;
-    private readonly IValidator<RecipeQueryParameters> _validator;
+    private readonly IValidator<RecipeQueryParameters> _recipeQueryParametersValidator;
+    private readonly IValidator<CreateRecipeRequest> _createRecipeRequestValidator;
 
-    public RecipeController(IRecipeService recipeService, IValidator<RecipeQueryParameters> validator)
+    public RecipeController(IRecipeService recipeService,
+        IValidator<RecipeQueryParameters> recipeQueryParametersvalidator,
+        IValidator<CreateRecipeRequest> createRecipeRequestValidator)
     {
         _recipeService = recipeService;
-        _validator = validator;
+        _recipeQueryParametersValidator = recipeQueryParametersvalidator;
+        _createRecipeRequestValidator = createRecipeRequestValidator;
     }
 
     [HttpGet]
@@ -25,7 +32,7 @@ public class RecipeController : ControllerBase
     public async Task<ActionResult<PagedResponse<RecipeResponse>>> GetAllAsync(
         [FromQuery] RecipeQueryParameters queryParameters)
     {
-        var validationResult = _validator.Validate(queryParameters);
+        var validationResult = _recipeQueryParametersValidator.Validate(queryParameters);
 
         if (!validationResult.IsValid)
         {
@@ -37,7 +44,7 @@ public class RecipeController : ControllerBase
         return Ok(response);
     }
 
-    [HttpGet("{id:guid}")]
+    [HttpGet("{id:guid}", Name = "GetRecipeById")]
     [ProducesResponseType(typeof(RecipeResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -46,5 +53,33 @@ public class RecipeController : ControllerBase
         var response = await _recipeService.GetByIdAsync(id);
 
         return Ok(response);
+    }
+
+    [HttpPost]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> CreateAsync([FromBody] CreateRecipeRequest request)
+    {
+        var userClaimId = User.FindFirst(ClaimTypes.NameIdentifier);
+
+        if (userClaimId is null || !Guid.TryParse(userClaimId.Value, out var userId))
+        {
+            throw new UnauthorizedException(
+                "Invalid user identity.");
+        }
+
+        var validationResult = await _createRecipeRequestValidator.ValidateAsync(request);
+
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors);
+        }
+
+        var response = await _recipeService.AddAsync(userId, request);
+
+        return CreatedAtRoute("GetRecipeById", new { id = response.Id }, response);
     }
 }

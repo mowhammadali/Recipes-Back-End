@@ -107,7 +107,7 @@ public sealed class RecipeService : IRecipeService
         await _unitOfWork.Recipes.AddAsync(recipe);
         await _unitOfWork.SaveChangesAsync();
 
-        var createdRecipe = _unitOfWork.Recipes.GetByIdAsync(recipe.Id);
+        var createdRecipe = await _unitOfWork.Recipes.GetByIdAsync(recipe.Id);
 
         var response = _mapper.Map<RecipeResponse>(createdRecipe);
         return response;
