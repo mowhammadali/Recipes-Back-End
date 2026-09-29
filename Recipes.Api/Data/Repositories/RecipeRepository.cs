@@ -13,9 +13,16 @@ public sealed class RecipeRepository : IRecipeRepository
         _dbContext = context;
     }
 
-    public Task<Recipe?> GetByIdAsync(Guid id)
+    public async Task<Recipe?> GetByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        var recipe = await _dbContext.Recipes
+            .Include(r => r.Ingredients)
+            .Include(r => r.Instructions)
+            .Include(r => r.MealTypes)
+            .Include(r => r.User)
+            .FirstOrDefaultAsync(r => r.Id == id);
+
+        return recipe;
     }
 
     public IQueryable<Recipe> Query()
@@ -25,11 +32,6 @@ public sealed class RecipeRepository : IRecipeRepository
             .Include(r => r.Instructions)
             .Include(r => r.MealTypes)
             .Include(r => r.User);
-    }
-
-    public Task<List<Recipe>> GetAllAsync()
-    {
-        throw new NotImplementedException();
     }
 
     public Task AddAsync(Recipe recipe)

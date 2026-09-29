@@ -6,7 +6,6 @@ public interface IRecipeRepository
 {
     Task<Recipe?> GetByIdAsync(Guid id);
     IQueryable<Recipe> Query();
-    Task<List<Recipe>> GetAllAsync();
     Task AddAsync(Recipe recipe);
     void Update(Recipe recipe);
     void Delete(Guid id);

@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Recipes.Api.Models.DTOs.MealTypes;
 using Recipes.Api.Models.DTOs.Recipes;
 using Recipes.Api.Models.Entities;
 using Recipes.Api.Models.ValueObjects;

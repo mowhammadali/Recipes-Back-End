@@ -6,4 +6,5 @@ namespace Recipes.Api.Services.Interfaces;
 public interface IRecipeService
 {
     Task<PagedResponse<RecipeResponse>> GetAllAsync(RecipeQueryParameters queryParameters);
+    Task<RecipeResponse> GetByIdAsync(Guid id);
 }

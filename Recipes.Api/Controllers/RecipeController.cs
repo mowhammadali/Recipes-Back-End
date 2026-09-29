@@ -36,4 +36,15 @@ public class RecipeController : ControllerBase
 
         return Ok(response);
     }
+
+    [HttpGet("{id:guid}")]
+    [ProducesResponseType(typeof(RecipeResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<RecipeResponse>> GetByIdAsync([FromRoute] Guid id)
+    {
+        var response = await _recipeService.GetByIdAsync(id);
+
+        return Ok(response);
+    }
 }
