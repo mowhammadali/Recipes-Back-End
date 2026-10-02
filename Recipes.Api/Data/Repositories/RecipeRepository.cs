@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Recipes.Api.Data.Repositories.Interfaces;
 using Recipes.Api.Models.Entities;
+using Recipes.Api.Models.Queries;
 
 namespace Recipes.Api.Data.Repositories;
 
@@ -54,5 +55,14 @@ public sealed class RecipeRepository : IRecipeRepository
     public void Delete(Recipe recipe)
     {
         _dbContext.Recipes.Remove(recipe);
+    }
+
+    public async Task<List<RecipeCountByMealType>> GetRecipeCountByMealTypeAsync()
+    {
+        var query = await _dbContext.Recipes.SelectMany(x => x.MealTypes)
+            .GroupBy(x => new { Id = x.Id, Name = x.Name })
+            .Select(x => new RecipeCountByMealType(x.Key.Id, x.Key.Name, x.Count())).ToListAsync();
+
+        return query;
     }
 }

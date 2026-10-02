@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Recipes.Api.Exceptions;
 using Recipes.Api.Models.DTOs.Common;
 using Recipes.Api.Models.DTOs.Recipes;
+using Recipes.Api.Models.DTOs.Statistics;
 using Recipes.Api.Services.Interfaces;
 
 namespace Recipes.Api.Controllers;
@@ -101,5 +102,17 @@ public class RecipeController : ControllerBase
 
         await _recipeService.DeleteAsync(recipeId, userId);
         return NoContent();
+    }
+
+    [HttpGet("statistics/by-meal-type")]
+    [ProducesResponseType(
+        typeof(List<RecipeCountByMealTypeResponse>),
+        StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<List<RecipeCountByMealTypeResponse>>> GetStatisticsByMealTypeAsync()
+    {
+        var response = await _recipeService.GetRecipeCountByMealTypeAsync();
+
+        return Ok(response);
     }
 }

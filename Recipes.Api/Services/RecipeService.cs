@@ -5,6 +5,7 @@ using Recipes.Api.Data.Repositories.Interfaces;
 using Recipes.Api.Exceptions;
 using Recipes.Api.Models.DTOs.Common;
 using Recipes.Api.Models.DTOs.Recipes;
+using Recipes.Api.Models.DTOs.Statistics;
 using Recipes.Api.Models.Entities;
 using Recipes.Api.Models.ValueObjects;
 using Recipes.Api.Services.Interfaces;
@@ -144,5 +145,15 @@ public sealed class RecipeService : IRecipeService
             "Recipe {RecipeId} has been deleted by user {UserId}",
             recipeId,
             userId);
+    }
+
+    public async Task<List<RecipeCountByMealTypeResponse>> GetRecipeCountByMealTypeAsync()
+    {
+        var recipeCountByMealType = await _unitOfWork.Recipes.GetRecipeCountByMealTypeAsync();
+
+        var response = recipeCountByMealType.Select(x =>
+            new RecipeCountByMealTypeResponse(x.MealTypeId, x.MealType, x.RecipeCount)).ToList();
+
+        return response;
     }
 }

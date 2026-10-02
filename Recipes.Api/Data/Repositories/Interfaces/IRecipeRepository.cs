@@ -1,4 +1,5 @@
 ﻿using Recipes.Api.Models.Entities;
+using Recipes.Api.Models.Queries;
 
 namespace Recipes.Api.Data.Repositories.Interfaces;
 
@@ -10,4 +11,5 @@ public interface IRecipeRepository
     Task AddAsync(Recipe recipe);
     void Update(Recipe recipe);
     void Delete(Recipe recipe);
+    Task<List<RecipeCountByMealType>> GetRecipeCountByMealTypeAsync();
 }
