@@ -36,4 +36,12 @@ public class FileController : ControllerBase
 
         return Ok(imageUrl);
     }
+
+    [HttpDelete("images")]
+    public async Task<IActionResult> DeleteImageAsync([FromQuery] string imageUrl)
+    {
+        await _fileStorageService.DeleteAsync(imageUrl);
+
+        return NoContent();
+    }
 }
