@@ -1,4 +1,5 @@
-﻿using Recipes.Api.Data.Repositories.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using Recipes.Api.Data.Repositories.Interfaces;
 using Recipes.Api.Models.Entities;
 
 namespace Recipes.Api.Data.Repositories;
@@ -12,23 +13,31 @@ public sealed class FavoriteRepository : IFavoriteRepository
         _dbContext = dbContext;
     }
 
-    public Task AddAsync(Favorite favorite)
+    public async Task<Favorite?> GetFavoriteAsync(Guid favoriteId)
     {
-        throw new NotImplementedException();
+        return await _dbContext.Favorites.FirstOrDefaultAsync(x => x.Id == favoriteId);
     }
 
-    public Task<Favorite?> GetByIdAsync(Guid id)
+    public async Task<bool> CheckExistFavoriteByRecipeIdAsync(Guid userId, Guid recipeId)
     {
-        throw new NotImplementedException();
+        return await _dbContext.Favorites.AnyAsync(x => x.RecipeId == recipeId && x.UserId == userId);
     }
 
-    public void Delete(Guid id)
+    public async Task AddAsync(Favorite favorite)
     {
-        throw new NotImplementedException();
+        await _dbContext.Favorites.AddAsync(favorite);
     }
 
-    public Task<List<Favorite>> GetAllByUserIdAsync(Guid userId)
+    public void Delete(Favorite favorite)
     {
-        throw new NotImplementedException();
+        _dbContext.Favorites.Remove(favorite);
+    }
+
+    public async Task<List<Favorite>> GetAllByUserIdAsync(Guid userId)
+    {
+        var favorites = await _dbContext.Favorites.Include(x => x.Recipe)
+            .Where(x => x.UserId == userId).ToListAsync();
+
+        return favorites;
     }
 }
