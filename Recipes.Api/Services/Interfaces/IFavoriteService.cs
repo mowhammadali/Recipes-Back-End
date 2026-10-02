@@ -1,8 +1,9 @@
-﻿using Recipes.Api.Models.Entities;
+﻿using Recipes.Api.Models.DTOs.Favorites;
 
 namespace Recipes.Api.Services.Interfaces;
 
 public interface IFavoriteService
 {
-    Task<List<Favorite>> GetAllAsync(Guid userId);
+    Task<List<FavoriteResponse>> GetAllAsync(Guid userId);
+    Task AddFavoriteAsync(Guid userId, Guid recipeId);
 }

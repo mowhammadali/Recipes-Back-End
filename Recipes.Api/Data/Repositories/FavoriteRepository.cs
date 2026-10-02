@@ -13,9 +13,9 @@ public sealed class FavoriteRepository : IFavoriteRepository
         _dbContext = dbContext;
     }
 
-    public Task AddAsync(Favorite favorite)
+    public async Task AddAsync(Favorite favorite)
     {
-        throw new NotImplementedException();
+        await _dbContext.Favorites.AddAsync(favorite);
     }
 
     public void Delete(Guid id)

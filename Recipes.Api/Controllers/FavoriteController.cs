@@ -36,4 +36,25 @@ public class FavoriteController : ControllerBase
         var response = await _recipeService.GetAllAsync(userId);
         return Ok(response);
     }
+
+    [HttpPost("{recipeId:guid}")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> CreateFavorite([FromRoute] Guid recipeId)
+    {
+        var userClaimId = User.FindFirst(ClaimTypes.NameIdentifier);
+
+        if (userClaimId is null || !Guid.TryParse(userClaimId.Value, out var userId))
+        {
+            throw new UnauthorizedException(
+                "Invalid user identity.");
+        }
+
+        await _recipeService.AddFavoriteAsync(userId, recipeId);
+
+        return Created();
+    }
 }
