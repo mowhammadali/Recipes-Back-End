@@ -1,4 +1,5 @@
-﻿using Recipes.Api.Data.Repositories.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using Recipes.Api.Data.Repositories.Interfaces;
 using Recipes.Api.Models.Entities;
 
 namespace Recipes.Api.Data.Repositories;
@@ -17,18 +18,16 @@ public sealed class FavoriteRepository : IFavoriteRepository
         throw new NotImplementedException();
     }
 
-    public Task<Favorite?> GetByIdAsync(Guid id)
-    {
-        throw new NotImplementedException();
-    }
-
     public void Delete(Guid id)
     {
         throw new NotImplementedException();
     }
 
-    public Task<List<Favorite>> GetAllByUserIdAsync(Guid userId)
+    public async Task<List<Favorite>> GetAllByUserIdAsync(Guid userId)
     {
-        throw new NotImplementedException();
+        var favorites = await _dbContext.Favorites.Include(x => x.Recipe)
+            .Where(x => x.UserId == userId).ToListAsync();
+
+        return favorites;
     }
 }

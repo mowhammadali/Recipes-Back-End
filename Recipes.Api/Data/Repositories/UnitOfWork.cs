@@ -9,14 +9,16 @@ public sealed class UnitOfWork : IUnitOfWork
     public IRecipeRepository Recipes { get; }
     public IMealTypeRepository MealTypes { get; }
     public IUserRepository Users { get; }
+    public IFavoriteRepository Favorites { get; }
 
     public UnitOfWork(IRecipeRepository recipes, IMealTypeRepository mealTypes, AppDbContext dbContext,
-        IUserRepository users)
+        IUserRepository users, IFavoriteRepository favorites)
     {
         Recipes = recipes;
         MealTypes = mealTypes;
         _dbContext = dbContext;
         Users = users;
+        Favorites = favorites;
     }
 
     public async Task<int> SaveChangesAsync()

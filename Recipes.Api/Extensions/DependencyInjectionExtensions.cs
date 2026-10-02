@@ -37,6 +37,7 @@ public static class DependencyInjectionExtensions
         services.AddScoped<IJwtService, JwtService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IRecipeService, RecipeService>();
+        services.AddScoped<IFavoriteService, FavoriteService>();
 
         return services;
     }
