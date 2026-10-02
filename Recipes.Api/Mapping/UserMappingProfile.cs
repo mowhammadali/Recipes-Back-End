@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Recipes.Api.Models.DTOs.Recipes;
 using Recipes.Api.Models.DTOs.Users;
 using Recipes.Api.Models.DTOs.UsersProfile;
 using Recipes.Api.Models.Entities;
@@ -15,5 +16,7 @@ public class UserMappingProfile : Profile
             .ForMember(
                 dest => dest.UserProfileResponse,
                 opt => opt.MapFrom(src => src.UserProfile));
+
+        CreateMap<User, RecipeUserResponse>();
     }
 }

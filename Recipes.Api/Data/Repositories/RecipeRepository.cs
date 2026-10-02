@@ -1,5 +1,7 @@
-﻿using Recipes.Api.Data.Repositories.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using Recipes.Api.Data.Repositories.Interfaces;
 using Recipes.Api.Models.Entities;
+using Recipes.Api.Models.Queries;
 
 namespace Recipes.Api.Data.Repositories;
 
@@ -12,19 +14,37 @@ public sealed class RecipeRepository : IRecipeRepository
         _dbContext = context;
     }
 
-    public Task<Recipe?> GetByIdAsync(Guid id)
+    public async Task<Recipe?> GetByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        var recipe = await _dbContext.Recipes
+            .Include(r => r.Ingredients)
+            .Include(r => r.Instructions)
+            .Include(r => r.MealTypes)
+            .Include(r => r.User)
+            .FirstOrDefaultAsync(r => r.Id == id);
+
+        return recipe;
     }
 
-    public Task<List<Recipe>> GetAllAsync()
+    public async Task<List<MealType>> GetMealTypesByIdsAsync(List<Guid> ids)
     {
-        throw new NotImplementedException();
+        var mealTypes = await _dbContext.MealTypes.Where(m => ids.Contains(m.Id)).ToListAsync();
+
+        return mealTypes;
     }
 
-    public Task AddAsync(Recipe recipe)
+    public IQueryable<Recipe> Query()
     {
-        throw new NotImplementedException();
+        return _dbContext.Recipes.AsNoTracking()
+            .Include(r => r.Ingredients)
+            .Include(r => r.Instructions)
+            .Include(r => r.MealTypes)
+            .Include(r => r.User);
+    }
+
+    public async Task AddAsync(Recipe recipe)
+    {
+        await _dbContext.Recipes.AddAsync(recipe);
     }
 
     public void Update(Recipe recipe)
@@ -32,8 +52,17 @@ public sealed class RecipeRepository : IRecipeRepository
         throw new NotImplementedException();
     }
 
-    public void Delete(Guid id)
+    public void Delete(Recipe recipe)
     {
-        throw new NotImplementedException();
+        _dbContext.Recipes.Remove(recipe);
+    }
+
+    public async Task<List<RecipeCountByMealType>> GetRecipeCountByMealTypeAsync()
+    {
+        var query = await _dbContext.Recipes.SelectMany(x => x.MealTypes)
+            .GroupBy(x => new { Id = x.Id, Name = x.Name })
+            .Select(x => new RecipeCountByMealType(x.Key.Id, x.Key.Name, x.Count())).ToListAsync();
+
+        return query;
     }
 }

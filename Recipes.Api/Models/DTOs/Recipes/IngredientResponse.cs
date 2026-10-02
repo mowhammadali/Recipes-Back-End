@@ -2,5 +2,5 @@
 
 public record IngredientResponse(
     string Name,
-    decimal Amount,
+    decimal Quantity,
     string Unit);

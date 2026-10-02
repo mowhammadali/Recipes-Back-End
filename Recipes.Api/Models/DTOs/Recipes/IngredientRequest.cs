@@ -2,5 +2,5 @@
 
 public record IngredientRequest(
     string Name,
-    decimal Amount,
+    decimal Quantity,
     string Unit);

@@ -5,18 +5,18 @@ namespace Recipes.Api.Models.Entities;
 
 public sealed class Recipe
 {
-    public Guid Id { get; init; }
-    public string Name { get; init; } = null!;
-    public string Description { get; init; } = null!;
-    public int PrepTimeMinutes { get; init; }
-    public int CookTimeMinutes { get; init; }
-    public int Serving { get; init; }
-    public Difficulty Difficulty { get; init; }
-    public string? ImageUrl { get; init; }
-    public DateTime CreatedAt { get; init; }
-    public ICollection<Ingredient> Ingredients { get; init; } = [];
-    public ICollection<Instruction> Instructions { get; init; } = [];
-    public ICollection<MealType> MealTypes { get; init; } = [];
-    public Guid UserId { get; init; }
-    public User User { get; init; } = null!;
+    public Guid Id { get; set; }
+    public string Name { get; set; } = null!;
+    public string Description { get; set; } = null!;
+    public int PrepTimeMinutes { get; set; }
+    public int CookTimeMinutes { get; set; }
+    public int Serving { get; set; }
+    public Difficulty Difficulty { get; set; }
+    public string? ImageUrl { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public ICollection<Ingredient> Ingredients { get; set; } = [];
+    public ICollection<Instruction> Instructions { get; set; } = [];
+    public ICollection<MealType> MealTypes { get; set; } = [];
+    public Guid UserId { get; set; }
+    public User User { get; set; } = null!;
 }
