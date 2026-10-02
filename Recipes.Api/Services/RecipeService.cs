@@ -18,7 +18,8 @@ public sealed class RecipeService : IRecipeService
     private readonly IMapper _mapper;
     private readonly ILogger<RecipeService> _logger;
 
-    public RecipeService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<RecipeService> logger)
+    public RecipeService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<RecipeService> logger,
+        IFileStorageService fileStorageService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
@@ -93,6 +94,7 @@ public sealed class RecipeService : IRecipeService
             CookTimeMinutes = createRecipeRequest.CookTimeMinutes,
             Serving = createRecipeRequest.Serving,
             Difficulty = createRecipeRequest.Difficulty,
+            ImageUrl = createRecipeRequest.ImageUrl,
             CreatedAt = DateTime.UtcNow,
             Ingredients = createRecipeRequest.Ingredients
                 .Select(x => new Ingredient(x.Name, x.Quantity, x.Unit))
