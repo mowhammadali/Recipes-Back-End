@@ -622,4 +622,7 @@ logs/
 log/
 *.log
 
+wwwroot/images/recipes/*
+wwwroot/images/*
+
 # End of https://www.toptal.com/developers/gitignore/api/aspnetcore,rider,visualstudio,visualstudiocode

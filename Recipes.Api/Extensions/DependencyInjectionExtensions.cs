@@ -38,6 +38,7 @@ public static class DependencyInjectionExtensions
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IRecipeService, RecipeService>();
         services.AddScoped<IFavoriteService, FavoriteService>();
+        services.AddScoped<IFileStorageService, FileStorageService>();
 
         return services;
     }

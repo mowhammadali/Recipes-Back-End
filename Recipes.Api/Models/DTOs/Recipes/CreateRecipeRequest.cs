@@ -10,7 +10,7 @@ public sealed record CreateRecipeRequest
     public int CookTimeMinutes { get; set; }
     public int Serving { get; set; }
     public Difficulty Difficulty { get; set; }
-    public IFormFile? Image { get; set; }
+    public string? ImageUrl { get; set; }
     public List<IngredientRequest> Ingredients { get; set; } = [];
     public List<InstructionRequest> Instructions { get; set; } = [];
     public List<Guid> MealTypeIds { get; set; } = [];
