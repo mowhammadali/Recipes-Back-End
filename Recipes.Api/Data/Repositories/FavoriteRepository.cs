@@ -13,14 +13,19 @@ public sealed class FavoriteRepository : IFavoriteRepository
         _dbContext = dbContext;
     }
 
+    public async Task<Favorite?> GetFavoriteAsync(Guid favoriteId)
+    {
+        return await _dbContext.Favorites.FirstOrDefaultAsync(x => x.Id == favoriteId);
+    }
+
     public async Task AddAsync(Favorite favorite)
     {
         await _dbContext.Favorites.AddAsync(favorite);
     }
 
-    public void Delete(Guid id)
+    public void Delete(Favorite favorite)
     {
-        throw new NotImplementedException();
+        _dbContext.Favorites.Remove(favorite);
     }
 
     public async Task<List<Favorite>> GetAllByUserIdAsync(Guid userId)

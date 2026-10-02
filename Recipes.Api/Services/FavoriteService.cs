@@ -59,4 +59,36 @@ public sealed class FavoriteService : IFavoriteService
         await _unitOfWork.Favorites.AddAsync(favorite);
         await _unitOfWork.SaveChangesAsync();
     }
+
+    public async Task RemoveFavoriteAsync(Guid userId, Guid favoriteId)
+    {
+        var user = await _unitOfWork.Users.GetByIdAsync(userId);
+
+        if (user is null)
+        {
+            _logger.LogWarning("User {userId} not found", userId);
+
+            throw new NotFoundException("User not found");
+        }
+
+        var favorite = await _unitOfWork.Favorites.GetFavoriteAsync(favoriteId);
+
+        if (favorite is null)
+        {
+            _logger.LogWarning("Favorite {favoriteId} not found", favoriteId);
+
+            throw new NotFoundException("Favorite not found");
+        }
+
+        if (favorite.UserId != user.Id)
+        {
+            _logger.LogWarning("User with {userId} could not remove favorite {favoriteId}",
+                userId, favoriteId);
+
+            throw new ForbiddenException("You only can remove your favorite.");
+        }
+
+        _unitOfWork.Favorites.Delete(favorite);
+        await _unitOfWork.SaveChangesAsync();
+    }
 }

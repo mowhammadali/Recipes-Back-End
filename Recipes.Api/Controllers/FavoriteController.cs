@@ -55,6 +55,27 @@ public class FavoriteController : ControllerBase
 
         await _recipeService.AddFavoriteAsync(userId, recipeId);
 
-        return Created();
+        return StatusCode(StatusCodes.Status201Created);
+    }
+
+    [HttpDelete("{favoriteId:guid}")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> DeleteFavorite([FromRoute] Guid favoriteId)
+    {
+        var userClaimId = User.FindFirst(ClaimTypes.NameIdentifier);
+
+        if (userClaimId is null || !Guid.TryParse(userClaimId.Value, out var userId))
+        {
+            throw new UnauthorizedException(
+                "Invalid user identity.");
+        }
+
+        await _recipeService.RemoveFavoriteAsync(userId, favoriteId);
+
+        return NoContent();
     }
 }
