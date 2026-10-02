@@ -18,6 +18,11 @@ public sealed class FavoriteRepository : IFavoriteRepository
         return await _dbContext.Favorites.FirstOrDefaultAsync(x => x.Id == favoriteId);
     }
 
+    public async Task<bool> CheckExistFavoriteByRecipeIdAsync(Guid userId, Guid recipeId)
+    {
+        return await _dbContext.Favorites.AnyAsync(x => x.RecipeId == recipeId && x.UserId == userId);
+    }
+
     public async Task AddAsync(Favorite favorite)
     {
         await _dbContext.Favorites.AddAsync(favorite);

@@ -49,6 +49,19 @@ public sealed class FavoriteService : IFavoriteService
             throw new NotFoundException("Recipe not found");
         }
 
+        bool isFavoriteExistWithThisRecipeId =
+            await _unitOfWork.Favorites.CheckExistFavoriteByRecipeIdAsync(userId, recipeId);
+
+        if (isFavoriteExistWithThisRecipeId)
+        {
+            _logger.LogWarning(
+                "User {UserId} attempted to add recipe {RecipeId} to favorites, but it is already in favorites.",
+                userId,
+                recipeId);
+
+            throw new ConflictException("Recipe is already in your favorites.");
+        }
+
         var favorite = new Favorite
         {
             Id = Guid.NewGuid(),
