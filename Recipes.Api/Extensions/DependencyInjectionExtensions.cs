@@ -121,6 +121,7 @@ public static class DependencyInjectionExtensions
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IUserProfileRepository, UserProfileRepository>();
         services.AddScoped<IFavoriteRepository, FavoriteRepository>();
+        services.AddScoped<IDapperMealTypeRepository, DapperMealTypeRepository>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
