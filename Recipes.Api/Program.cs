@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApplicationServices();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDatabaseContext(builder.Configuration);
+builder.Services.AddDapperFactory();
 builder.Services.AddInfrastructureServices();
 builder.Services.AddJwtConfiguration(builder.Configuration);
 builder.Host.AddLoggingConfiguration();

@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Recipes.Api.Data;
+using Recipes.Api.Data.Dapper;
 using Recipes.Api.Data.Repositories;
 using Recipes.Api.Data.Repositories.Interfaces;
 using Recipes.Api.Data.Seed;
@@ -106,6 +107,13 @@ public static class DependencyInjectionExtensions
         return services;
     }
 
+    public static IServiceCollection AddDapperFactory(this IServiceCollection services)
+    {
+        services.AddScoped<DapperConnectionFactory>();
+
+        return services;
+    }
+
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services)
     {
         services.AddScoped<IRecipeRepository, RecipeRepository>();
@@ -113,6 +121,7 @@ public static class DependencyInjectionExtensions
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IUserProfileRepository, UserProfileRepository>();
         services.AddScoped<IFavoriteRepository, FavoriteRepository>();
+        services.AddScoped<IDapperMealTypeRepository, DapperMealTypeRepository>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
