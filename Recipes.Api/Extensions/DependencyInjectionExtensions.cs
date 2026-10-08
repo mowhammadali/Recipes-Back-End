@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Recipes.Api.Data;
+using Recipes.Api.Data.Dapper;
 using Recipes.Api.Data.Repositories;
 using Recipes.Api.Data.Repositories.Interfaces;
 using Recipes.Api.Data.Seed;
@@ -102,6 +103,13 @@ public static class DependencyInjectionExtensions
                                throw new NullReferenceException("The connection string is null.");
 
         services.AddDbContext<AppDbContext>(options => { options.UseNpgsql(connectionString); });
+
+        return services;
+    }
+
+    public static IServiceCollection AddDapperFactory(this IServiceCollection services)
+    {
+        services.AddScoped<DapperConnectionFactory>();
 
         return services;
     }
